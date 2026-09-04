@@ -169,7 +169,7 @@ export default function InfoSideWidget() {
         </div>
 
         {/* =====================================================
-            المقبض الجانبي الشفاف الزجاجي (Glassmorphism)
+            المقبض الجانبي الغامق والشفاف
         ====================================================== */}
         <button
           type="button"
@@ -180,9 +180,9 @@ export default function InfoSideWidget() {
             top-0
             h-full
             ${handleWidth}
-            bg-white/10
+            bg-slate-900/40
             backdrop-blur-md
-            hover:bg-white/20
+            hover:bg-slate-900/60
             rounded-r-xl
             flex
             items-center
@@ -192,7 +192,7 @@ export default function InfoSideWidget() {
             duration-300
             cursor-pointer
             border
-            border-white/20
+            border-slate-700/50
             border-l-0
           `}
           title={isOpen ? "إغلاق" : "عرض المزيد من الشروحات"}
