@@ -2,13 +2,23 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 
 export default function DeveloperPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
+  const [isZoomed, setIsZoomed] = useState<boolean>(false);
+
+  // إغلاق نافذة التكبير عند الضغط على زر Esc
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsZoomed(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleEmailSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -66,14 +76,20 @@ export default function DeveloperPage() {
           
           {/* القسم الأيمن: معلومات المطور */}
           <div className="flex flex-col items-center text-center space-y-3">
-            <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-slate-900 shadow-lg">
+            <div 
+              onClick={() => setIsZoomed(true)}
+              className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-slate-900 shadow-lg cursor-zoom-in group"
+            >
               <Image
                 src="/developer_last_one1.jpg"
                 alt="المهندس عبدالله المعافا"
                 fill
-                className="object-cover"
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
                 priority
               />
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="text-white text-xs bg-black/60 px-2 py-1 rounded-full">🔍</span>
+              </div>
             </div>
 
             <div className="pt-2">
@@ -173,6 +189,35 @@ export default function DeveloperPage() {
 
         </div>
       </div>
+
+      {/* Lightbox - النافذة المنبثقة لتكبير صورة المطور بالحجم الكامل */}
+      {isZoomed && (
+        <div
+          onClick={() => setIsZoomed(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 transition-all"
+        >
+          {/* زر الإغلاق X في الأعلى على اليسار */}
+          <button
+            onClick={() => setIsZoomed(false)}
+            className="absolute top-5 left-5 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/80 text-white hover:bg-red-600 transition border border-slate-700 shadow-lg"
+            title="إغلاق"
+          >
+            ✕
+          </button>
+
+          {/* حاوية الصورة الحافظة لأبعادها الكاملة */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-xl shadow-2xl border border-slate-800"
+          >
+            <img
+              src="/developer_last_one1.jpg"
+              alt="المهندس عبدالله المعافا"
+              className="max-h-[85vh] max-w-[90vw] object-contain rounded-xl"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
