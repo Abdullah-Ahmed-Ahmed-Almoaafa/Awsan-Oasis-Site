@@ -65,11 +65,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const currencySymbol = product.currency || "ر.ي";
   const firstImageUrl = images.length > 0 ? images[0] : "";
 
-  // النص المحدد بالضبط مع رابط الصورة
+  // نص الواتساب بالتنسيق المطلق تماماً
   const whatsappMessage = 
-    `السلام عليكم, أرغب في طلب المنتج التالي:\n` +
-    `الاسم: ${product.name}\n` +
-    `السعر: ${product.newPrice} ${currencySymbol}\n` +
+    `السلام عليكم، أرغب في طلب المنتج التالي:\n` +
+    `📌 الاسم: ${product.name}\n` +
+    `💰 السعر: ${product.newPrice} ${currencySymbol}\n\n` +
     (firstImageUrl ? `${firstImageUrl}` : "");
 
   return (
