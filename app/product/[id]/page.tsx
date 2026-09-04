@@ -63,17 +63,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const images = product.images && product.images.length > 0 ? product.images : [];
   const currencySymbol = product.currency || "ر.ي";
-
-  // تحضير نص الواتساب المتكامل مع معلومات المنتج ورابط الصورة ورابط الصفحة
-  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
   const firstImageUrl = images.length > 0 ? images[0] : "";
 
+  // النص المحدد بالضبط مع رابط الصورة
   const whatsappMessage = 
-    `السلام عليكم، أرغب في طلب المنتج التالي:\n` +
-    `📌 الاسم: ${product.name}\n` +
-    `💰 السعر: ${product.newPrice} ${currencySymbol}\n` +
-    (firstImageUrl ? `🖼️ صورة المنتج: ${firstImageUrl}\n` : "") +
-    (currentUrl ? `🔗 رابط المنتج: ${currentUrl}` : "");
+    `السلام عليكم, أرغب في طلب المنتج التالي:\n` +
+    `الاسم: ${product.name}\n` +
+    `السعر: ${product.newPrice} ${currencySymbol}\n` +
+    (firstImageUrl ? `${firstImageUrl}` : "");
 
   return (
     <div className="max-w-4xl mx-auto py-6">
