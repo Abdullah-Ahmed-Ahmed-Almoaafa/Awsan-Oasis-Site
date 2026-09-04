@@ -9,7 +9,7 @@ import { IProduct } from "@/types/product";
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
-  
+
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
@@ -63,6 +63,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const images = product.images && product.images.length > 0 ? product.images : [];
   const currencySymbol = product.currency || "ر.ي";
+
+  // تحضير نص الواتساب المتكامل مع معلومات المنتج ورابط الصورة ورابط الصفحة
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+  const firstImageUrl = images.length > 0 ? images[0] : "";
+
+  const whatsappMessage = 
+    `السلام عليكم، أرغب في طلب المنتج التالي:\n` +
+    `📌 الاسم: ${product.name}\n` +
+    `💰 السعر: ${product.newPrice} ${currencySymbol}\n` +
+    (firstImageUrl ? `🖼️ صورة المنتج: ${firstImageUrl}\n` : "") +
+    (currentUrl ? `🔗 رابط المنتج: ${currentUrl}` : "");
 
   return (
     <div className="max-w-4xl mx-auto py-6">
@@ -183,7 +194,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
           <div className="mt-6 border-t border-slate-800 pt-4">
             <a
-              href={`https://wa.me/967777376160?text=${encodeURIComponent(`السلام عليكم، أرغب في طلب: ${product.name}`)}`}
+              href={`https://wa.me/967777376160?text=${encodeURIComponent(whatsappMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white shadow-lg hover:bg-emerald-500 transition"
