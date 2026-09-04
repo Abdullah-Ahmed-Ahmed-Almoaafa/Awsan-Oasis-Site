@@ -7,7 +7,7 @@ export default function InfoSideWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
   // ⚙️ التحكم في عرض المقبض
-  const handleWidth = "w-[16px]"; 
+  const handleWidth = "w-[10px]"; 
 
   // دالة الانتقال السلس إلى الـ Footer وإغلاق البطاقة تلقائياً
   const handleScrollToFooter = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -124,7 +124,7 @@ export default function InfoSideWidget() {
           </p>
 
           {/* =====================================================
-              سهم الانتقال إلى Footer (متحرك ومحدث بأيقونة SVG عصريّة)
+              سهم الانتقال إلى Footer
           ====================================================== */}
           <button
             type="button"
@@ -151,7 +151,6 @@ export default function InfoSideWidget() {
             title="الانتقال إلى أسفل الصفحة"
             aria-label="الانتقال إلى منصات التواصل الاجتماعي"
           >
-            {/* أيقونة السهم المزدوج لأسفل (Double Chevron) */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -170,7 +169,7 @@ export default function InfoSideWidget() {
         </div>
 
         {/* =====================================================
-            المقبض الجانبي بطول البطاقة بالكامل
+            المقبض الجانبي الشفاف الزجاجي (Glassmorphism)
         ====================================================== */}
         <button
           type="button"
@@ -181,30 +180,33 @@ export default function InfoSideWidget() {
             top-0
             h-full
             ${handleWidth}
-            bg-[#854800]
-            hover:bg-[#9d5800]
-            text-amber-100
+            bg-white/10
+            backdrop-blur-md
+            hover:bg-white/20
             rounded-r-xl
             flex
             items-center
             justify-center
             shadow-lg
-            transition-colors
+            transition-all
             duration-300
             cursor-pointer
             border
-            border-[#9d5800]/40
+            border-white/20
             border-l-0
           `}
           title={isOpen ? "إغلاق" : "عرض المزيد من الشروحات"}
           aria-label={isOpen ? "إغلاق البطاقة" : "فتح بطاقة المعلومات"}
           aria-expanded={isOpen}
         >
+          {/* الأيقونة بارزة بوضوح ولون العنبر (Amber) الساطع */}
           <span
             className={`
               inline-block
               text-sm
-              font-bold
+              font-black
+              text-amber-400
+              drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]
               leading-none
               transition-transform
               duration-500
