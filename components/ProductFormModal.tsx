@@ -11,6 +11,9 @@ interface ProductFormModalProps {
   initialData?: IProduct | null;
 }
 
+// الوحدات الافتراضية المتاحة في القائمة
+const PRESET_UNITS = ["كيلو", "دبة/ت", "لتر", "علبة", "برطمان", "قارورة", "عبوة"];
+
 export default function ProductFormModal({
   isOpen,
   onClose,
@@ -22,6 +25,8 @@ export default function ProductFormModal({
   const [oldPrice, setOldPrice] = useState<number | "">(0);
   const [newPrice, setNewPrice] = useState<number | "">(0);
   const [quantity, setQuantity] = useState<number | "">(10);
+  const [unitSelect, setUnitSelect] = useState("كيلو");
+  const [customUnit, setCustomUnit] = useState("");
   const [currency, setCurrency] = useState("ر.ي");
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,12 +41,24 @@ export default function ProductFormModal({
       setQuantity(initialData.quantity || 0);
       setCurrency(initialData.currency || "ر.ي");
       setImages(initialData.images || []);
+
+      // فحص ما إذا كانت الوحدة الحالية ضمن الخيارات الجاهزة أم وحدة مخصصة
+      const currentUnit = initialData.unit || "كيلو";
+      if (PRESET_UNITS.includes(currentUnit)) {
+        setUnitSelect(currentUnit);
+        setCustomUnit("");
+      } else {
+        setUnitSelect("custom");
+        setCustomUnit(currentUnit);
+      }
     } else {
       setName("");
       setDescription("");
       setOldPrice(0);
       setNewPrice(0);
       setQuantity(10);
+      setUnitSelect("كيلو");
+      setCustomUnit("");
       setCurrency("ر.ي");
       setImages([]);
     }
@@ -50,7 +67,6 @@ export default function ProductFormModal({
 
   if (!isOpen) return null;
 
-  // دالة تصغير وضغط الصورة تلقائياً لضمان عدم تجاوز سعة Firestore (1MB)
   const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -60,7 +76,7 @@ export default function ProductFormModal({
         img.src = event.target?.result as string;
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 800; // أقصى عرض كافٍ للشاشات والموبايل
+          const MAX_WIDTH = 800;
           const MAX_HEIGHT = 800;
           let width = img.width;
           let height = img.height;
@@ -82,7 +98,6 @@ export default function ProductFormModal({
           const ctx = canvas.getContext("2d");
           ctx?.drawImage(img, 0, 0, width, height);
 
-          // تحويل الصورة لجودة 70% بصيغة JPEG للحصول على حجم صغير جداً
           const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
           resolve(compressedBase64);
         };
@@ -90,13 +105,11 @@ export default function ProductFormModal({
     });
   };
 
-  // معالجة اختيار ورفع الصور مع شرط ألا تتعدى 4 صور
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setUploadError("");
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    // التحقق من أن إجمالي الصور لا يتجاوز 4 صور
     if (images.length + files.length > 4) {
       setUploadError("الحد الأقصى المسموح به هو 4 صور فقط للمنتج.");
       return;
@@ -106,7 +119,7 @@ export default function ProductFormModal({
     const newCompressedImages = await Promise.all(compressedPromises);
 
     setImages((prev) => [...prev, ...newCompressedImages]);
-    e.target.value = ""; // إعادة ضبط حقل الاختيار
+    e.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
@@ -118,6 +131,9 @@ export default function ProductFormModal({
     e.preventDefault();
     setLoading(true);
 
+    // تحديد الوحدة الفعلية المختارة
+    const finalUnit = unitSelect === "custom" ? customUnit.trim() || "عبوة" : unitSelect;
+
     try {
       await onSubmit({
         name,
@@ -125,6 +141,7 @@ export default function ProductFormModal({
         oldPrice: Number(oldPrice) || 0,
         newPrice: Number(newPrice) || 0,
         quantity: Number(quantity) || 0,
+        unit: finalUnit,
         currency,
         images,
         createdAt: initialData?.createdAt || new Date(),
@@ -170,8 +187,8 @@ export default function ProductFormModal({
             />
           </div>
 
-          {/* شبكة الأسعار والعملة والكمية */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {/* شبكة الأسعار والعملة والكمية ونوع الوحدة */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">السعر السابق</label>
               <input
@@ -196,10 +213,10 @@ export default function ProductFormModal({
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-2 py-2 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
               >
-                <option value="ر.ي">يمني(ر.ي)</option>
-                <option value="ر.س">سعودي(ر.س)</option>
+                <option value="ر.ي">يمني (ر.ي)</option>
+                <option value="ر.س">سعودي (ر.س)</option>
                 <option value="$">دولار ($)</option>
               </select>
             </div>
@@ -213,16 +230,49 @@ export default function ProductFormModal({
                 className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
               />
             </div>
+
+            {/* نوع الوحدة */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">الوحدة</label>
+              <select
+                value={unitSelect}
+                onChange={(e) => setUnitSelect(e.target.value)}
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-2 py-2 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
+              >
+                {PRESET_UNITS.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+                <option value="custom">✍️ أخرى...</option>
+              </select>
+            </div>
           </div>
 
-          {/* قسم اختيار الصور من الجهاز */}
+          {/* حقل الإدخال النصي المخصص (يظهر فقط إذا اختار "أخرى...") */}
+          {unitSelect === "custom" && (
+            <div>
+              <label className="block text-xs font-semibold text-amber-400 mb-1">
+                اكتب الوحدة المخصصة:
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="مثال: كرتون, طرد, جالون..."
+                value={customUnit}
+                onChange={(e) => setCustomUnit(e.target.value)}
+                className="w-full rounded-xl border border-amber-500/50 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+              />
+            </div>
+          )}
+
+          {/* قسم اختيار الصور */}
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-xs font-semibold text-slate-300">
                 صور المنتج (رفع من الجهاز)
               </label>
 
-              {/* عداد الصور المضافة */}
               <span className="text-[11px] text-amber-400 font-semibold">
                 {images.length} / 4 صور
               </span>
@@ -237,12 +287,10 @@ export default function ProductFormModal({
               className="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer bg-slate-950 rounded-xl border border-slate-700 p-1 disabled:opacity-50 disabled:cursor-not-allowed"
             />
 
-            {/* رسالة الخطأ في حال تجاوز 4 صور */}
             {uploadError && (
               <p className="text-red-400 text-xs mt-1 font-semibold">{uploadError}</p>
             )}
 
-            {/* عرض معاينة الصور */}
             {images.length > 0 && (
               <div className="grid grid-cols-4 gap-2 pt-3">
                 {images.map((img, i) => (

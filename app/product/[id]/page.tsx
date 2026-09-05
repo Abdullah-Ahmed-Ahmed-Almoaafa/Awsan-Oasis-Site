@@ -67,8 +67,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   // نص الواتساب المحدد بدون رابط الصورة
   const whatsappMessage = 
     `السلام عليكم، أرغب في طلب المنتج التالي:\n` +
-    `📌 الاسم: ${product.name}\n` +
-    `💰 السعر: ${product.newPrice} ${currencySymbol}`;
+    `الاسم: ${product.name}\n` +
+    `السعر: ${product.newPrice} ${currencySymbol}`;
 
   return (
     <div className="max-w-4xl mx-auto py-6">
@@ -178,12 +178,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               ) : null}
 
               {/* الكمية المتوفرة */}
-              <div className="flex items-center justify-between pt-1 text-xs text-slate-400">
-                <span>الكمية المتوفرة:</span>
-                <span className={`font-bold ${product.quantity > 0 ? "text-emerald-400" : "text-red-400"}`}>
-                  {product.quantity > 0 ? `${product.quantity} عبوة` : "نفذت الكمية"}
-                </span>
-              </div>
+<div className="flex items-center justify-between pt-1 text-xs text-slate-400">
+  <span>الكمية المتوفرة:</span>
+  <span className={`font-bold ${product.quantity > 0 ? "text-emerald-400" : "text-red-400"}`}>
+    {product.quantity > 0 ? `${product.quantity} ${product.unit || "كيلو"}` : "نفذت الكمية"}
+  </span>
+</div>
             </div>
           </div>
 

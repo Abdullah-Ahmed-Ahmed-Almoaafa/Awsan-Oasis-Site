@@ -10,6 +10,9 @@ export default function DeveloperPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
   const [isZoomed, setIsZoomed] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const phoneNumber = "783939817";
 
   // إغلاق نافذة التكبير عند الضغط على زر Esc
   useEffect(() => {
@@ -19,6 +22,17 @@ export default function DeveloperPage() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  // دالة نسخ الرقم للذاكرة الحافظة
+  const handleCopyPhone = async () => {
+    try {
+      await navigator.clipboard.writeText(phoneNumber);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (err) {
+      console.error("فشل نسخ الرقم", err);
+    }
+  };
 
   const handleEmailSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -59,6 +73,16 @@ export default function DeveloperPage() {
   return (
     <div dir="rtl" className="min-h-screen bg-[#dccac0]/40 text-slate-800 py-10 px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center relative font-sans">
       
+      {/* إشعار نسخ رقم الهاتف (Toast) */}
+      <div
+        className={`fixed bottom-6 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-slate-700 transition-all duration-300 ${
+          copied ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+        }`}
+      >
+        <span className="text-emerald-400">✓</span>
+        <span>تم نسخ رقم الهاتف للذاكرة!</span>
+      </div>
+
       {/* الحاوية الرئيسية */}
       <div className="w-full max-w-4xl bg-[#e6dad1]/80 backdrop-blur-sm rounded-3xl p-6 sm:p-12 shadow-xl border border-amber-900/10 animate-fade-in-up relative">
         
@@ -107,20 +131,41 @@ export default function DeveloperPage() {
               الاصدار: 1.0.0
             </div>
 
-            <div className="text-xs text-slate-400 space-y-0.5 pt-1">
+            <div className="text-xs text-slate-400 space-y-1 pt-1 flex flex-col items-center">
               <p>جميع الحقوق محفوظة © المهندس عبدالله المعافا 2026</p>
-              <p className="dir-ltr">
-                هاتف: <a href="tel:783939817" className="hover:underline text-slate-500">783939817</a>
-              </p>
+              
+              <div className="flex items-center gap-2">
+                <p className="dir-ltr">
+                  هاتف: <a href={`tel:${phoneNumber}`} className="hover:underline text-slate-600 font-semibold">{phoneNumber}</a>
+                </p>
+                {/* زر نسخ الرقم */}
+                <button
+                  type="button"
+                  onClick={handleCopyPhone}
+                  title="نسخ الرقم"
+                  className="p-1 rounded-md hover:bg-black/5 text-slate-500 hover:text-slate-800 transition active:scale-95 cursor-pointer"
+                >
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <a
               href="https://wa.me/967783939817"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center justify-center px-6 py-2 bg-[#004d25] hover:bg-[#00381b] text-white text-xs font-bold rounded-full transition-all duration-300 shadow-md transform hover:scale-105"
+              className="group mt-3 inline-flex items-center justify-center gap-2.5 px-6 py-2.5 bg-[#004d25] hover:bg-[#25D366] hover:text-slate-900 text-white text-xs font-bold rounded-full transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1 active:translate-y-0 cursor-pointer animate-[pulseScale_2.5s_infinite_ease-in-out]"
             >
-              واتساب الأعمال
+              <svg 
+                className="w-4 h-4 fill-current transition-transform duration-300 group-hover:-translate-x-1" 
+                viewBox="0 0 24 24"
+              >
+                <path d="M12.031 0c-6.627 0-12 5.373-12 12 0 2.159.57 4.26 1.652 6.12l-1.683 6.148 6.291-1.65c1.782.972 3.801 1.482 5.74 1.482 6.627 0 12-5.373 12-12s-5.373-12-12-12zm0 22c-1.817 0-3.593-.485-5.148-1.403l-.369-.219-3.827 1.004 1.023-3.731-.241-.383c-1.012-1.611-1.547-3.483-1.547-5.388 0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm5.483-7.466c-.301-.151-1.777-.877-2.053-.977-.276-.1-.477-.151-.678.151-.201.301-.778.977-.954 1.178-.176.201-.351.226-.652.075-1.782-.892-2.955-1.593-4.137-3.621-.314-.541.314-.502.898-1.67.075-.151.038-.276-.019-.377-.057-.101-.678-1.633-.929-2.235-.245-.587-.495-.507-.678-.517-.176-.008-.377-.01-.578-.01s-.527.075-.803.377c-.276.301-1.054 1.03-1.054 2.512s1.079 2.913 1.23 3.114c.151.201 2.122 3.24 5.141 4.544 2.152.929 2.981.931 4.037.777.627-.091 1.777-.728 2.028-1.431.251-.703.251-1.306.176-1.431-.075-.126-.276-.201-.577-.352z"/>
+              </svg>
+
+              <span>تواصل معي عبر الواتساب</span>
             </a>
           </div>
 

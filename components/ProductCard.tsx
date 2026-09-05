@@ -12,6 +12,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const currencySymbol = product.currency || "ر.ي";
+  const unitLabel = product.unit || "كيلو";
   const hasMultipleImages = product.images && product.images.length > 1;
 
   useEffect(() => {
@@ -51,8 +52,29 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* شارة نفذت الكمية */}
-        {product.quantity <= 0 && (
+        {/* شارة الكمية والوحدة (تظهر فقط عند توفر كمية) */}
+        {product.quantity > 0 ? (
+          <div className="absolute top-2 left-2 z-10 w-16 h-16 drop-shadow-md select-none pointer-events-none">
+            {/* خلفية الشارة المشرشرة */}
+            <Image
+              src="/badge.png"
+              alt="Badge"
+              fill
+              sizes="64px"
+              className="object-contain"
+              priority
+            />
+            {/* النصوص داخل الشارة */}
+            <div 
+              className="absolute inset-0 flex flex-col items-center justify-center text-center font-black leading-tight"
+              style={{ color: "#FFB902" }}
+            >
+              <span className="text-base tracking-tight">{product.quantity}</span>
+              <span className="text-[11px] font-bold">{unitLabel}</span>
+            </div>
+          </div>
+        ) : (
+          /* شارة نفذت الكمية */
           <div className="absolute top-2 right-2 z-10 rounded-md bg-red-600 px-2 py-1 text-xs font-bold text-white shadow">
             نفذت الكمية
           </div>

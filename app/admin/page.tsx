@@ -138,12 +138,15 @@ export default function AdminDashboardPage() {
                 <th className="p-4">السعر القديم</th>
                 <th className="p-4">السعر الحالي</th>
                 <th className="p-4">الكمية</th>
+                <th className="p-4">الوحدة</th>
                 <th className="p-4 text-center">الإجراءات</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-200">
               {products.map((product) => {
                 const currencySymbol = product.currency || "ر.ي";
+                const unitLabel = product.unit || "كيلو";
+
                 return (
                   <tr key={product.id || product.name} className="hover:bg-slate-800/50 transition">
                     <td className="p-4 font-semibold text-amber-300">{product.name}</td>
@@ -154,8 +157,19 @@ export default function AdminDashboardPage() {
                       {product.newPrice} {currencySymbol}
                     </td>
                     <td className="p-4">
-                      <span className={`px-2 py-0.5 text-xs rounded-md ${product.quantity > 0 ? "bg-emerald-950 text-emerald-400" : "bg-red-950 text-red-400"}`}>
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-md font-semibold ${
+                          product.quantity > 0
+                            ? "bg-emerald-950 text-emerald-400 border border-emerald-800/50"
+                            : "bg-red-950 text-red-400 border border-red-800/50"
+                        }`}
+                      >
                         {product.quantity}
+                      </span>
+                    </td>
+                    <td className="p-4 text-slate-300 font-medium">
+                      <span className="bg-slate-800/80 px-2 py-1 rounded-md text-xs border border-slate-700">
+                        {unitLabel}
                       </span>
                     </td>
                     <td className="p-4 flex items-center justify-center gap-2">
