@@ -38,7 +38,7 @@ export default function Footer() {
               إنستقرام
             </a>
             <a
-              href="https://x.com/AboSheebsameh"
+              href="https://x.com/WahtAswanAdn"
               target="_blank"
               rel="noopener noreferrer"
               className="px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 transition"
