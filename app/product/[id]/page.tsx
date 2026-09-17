@@ -64,6 +64,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const images = product.images && product.images.length > 0 ? product.images : [];
   const currencySymbol = product.currency || "ر.ي";
 
+  // دوان الانتقال بين الصور (RTL: التالي يسار، السابق يمين)
+  const handleNextImage = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setSelectedImageIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const handlePrevImage = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
   // نص الواتساب المحدد بدون رابط الصورة
   const whatsappMessage = 
     `السلام عليكم، أرغب في طلب المنتج التالي:\n` +
@@ -93,7 +104,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                
+                {/* أسهم التبديل بين الصور - ظاهرة دائماً عند وجود أكثر من صورة */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handlePrevImage}
+                      aria-label="الصورة السابقة"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-950/70 text-amber-400 border border-slate-700/80 shadow-md backdrop-blur-md hover:bg-amber-500 hover:text-slate-950 transition"
+                    >
+                      ❮
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextImage}
+                      aria-label="الصورة التالية"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-950/70 text-amber-400 border border-slate-700/80 shadow-md backdrop-blur-md hover:bg-amber-500 hover:text-slate-950 transition"
+                    >
+                      ❯
+                    </button>
+                  </>
+                )}
+
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                   <span className="bg-slate-900/80 text-amber-400 text-xs px-3 py-1.5 rounded-full border border-amber-500/30 backdrop-blur-sm">
                     🔍 اضغط للتكبير
                   </span>
@@ -138,20 +172,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           )}
         </div>
 
-        {/* تفاصيل المنتج */}
-        <div className="flex flex-col justify-between">
+          {/* تفاصيل المنتج */}
+          <div className="flex flex-col justify-between">
           <div className="space-y-4">
-            <div>
-              <span className="inline-block rounded-md bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-400 border border-amber-500/20">
-              </span>
-              <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold text-amber-300">
-                {product.name}
-              </h1>
-            </div>
+          <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-amber-300">
+          {product.name}
+          </h1>
+          </div>
 
-            <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">
-              {product.description}
-            </p>
+          <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+          {product.description}
+          </p>
 
             <div className="border-t border-slate-800 pt-4 space-y-2">
               {/* السعر الحالي */}
@@ -178,12 +210,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               ) : null}
 
               {/* الكمية المتوفرة */}
-<div className="flex items-center justify-between pt-1 text-xs text-slate-400">
-  <span>الكمية المتوفرة:</span>
-  <span className={`font-bold ${product.quantity > 0 ? "text-emerald-400" : "text-red-400"}`}>
-    {product.quantity > 0 ? `${product.quantity} ${product.unit || "كيلو"}` : "نفذت الكمية"}
-  </span>
-</div>
+              <div className="flex items-center justify-between pt-1 text-xs text-slate-400">
+                <span>الكمية المتوفرة:</span>
+                <span className={`font-bold ${product.quantity > 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  {product.quantity > 0 ? `${product.quantity} ${product.unit || "كيلو"}` : "نفذت الكمية"}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -215,6 +247,28 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           >
             ✕
           </button>
+
+          {/* أسهم التبديل داخل نافذة التكبير */}
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrevImage}
+                aria-label="الصورة السابقة"
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-slate-900/80 text-amber-400 border border-slate-700 hover:bg-amber-500 hover:text-slate-950 transition"
+              >
+                ❮
+              </button>
+              <button
+                type="button"
+                onClick={handleNextImage}
+                aria-label="الصورة التالية"
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-slate-900/80 text-amber-400 border border-slate-700 hover:bg-amber-500 hover:text-slate-950 transition"
+              >
+                ❯
+              </button>
+            </>
+          )}
 
           {/* حاوية الصورة الحافظة لأبعادها الكاملة */}
           <div

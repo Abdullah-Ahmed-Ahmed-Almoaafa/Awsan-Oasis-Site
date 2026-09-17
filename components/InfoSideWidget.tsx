@@ -6,29 +6,22 @@ import Image from "next/image";
 export default function InfoSideWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // ⚙️ التحكم في عرض المقبض
-  const handleWidth = "w-[10px]"; 
+  const handleWidth = "w-[12px]";
 
-  // دالة الانتقال السلس إلى الـ Footer وإغلاق البطاقة تلقائياً
   const handleScrollToFooter = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-
-    // إغلاق البطاقة فوراً
     setIsOpen(false);
 
-    // البحث عن الـ Footer
     const footerElement =
       document.getElementById("footer") ||
       document.querySelector("footer");
 
-    // الانتقال السلس إلى الـ Footer
     if (footerElement) {
       footerElement.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     } else {
-      // حل احتياطي في حال عدم العثور على Footer
       window.scrollTo({
         top: document.body.scrollHeight,
         behavior: "smooth",
@@ -44,9 +37,7 @@ export default function InfoSideWidget() {
       }`}
     >
       <div className="relative flex items-stretch">
-        {/* =====================================================
-            جسم البطاقة الأبيض
-        ====================================================== */}
+        {/* جسم البطاقة */}
         <div
           className="
             w-[82vw]
@@ -66,7 +57,7 @@ export default function InfoSideWidget() {
             border-l-0
           "
         >
-          {/* زر الإغلاق الصغير */}
+          {/* زر الإغلاق */}
           <button
             type="button"
             onClick={() => setIsOpen(false)}
@@ -86,9 +77,7 @@ export default function InfoSideWidget() {
             ✕
           </button>
 
-          {/* =====================================================
-              Logo واحة أوسان
-          ====================================================== */}
+          {/* Logo */}
           <div className="relative h-12 w-12 sm:h-14 sm:w-14 mb-3">
             <Image
               src="/logo.png"
@@ -100,9 +89,7 @@ export default function InfoSideWidget() {
             />
           </div>
 
-          {/* =====================================================
-              النص التوضيحي
-          ====================================================== */}
+          {/* النص التوضيحي */}
           <p
             className="
               text-xs
@@ -117,15 +104,12 @@ export default function InfoSideWidget() {
             <span className="block mb-2 font-bold text-slate-800">
               هل ترغب في معرفة المزيد عن أنواع العسل التي نقدمها؟
             </span>
-
             تجدون المزيد من الشروحات والفيديوهات والمعلومات والتفاصيل حول كل
             نوع من أنواع العسل عبر صفحاتنا الرسمية على منصات التواصل الاجتماعي،
             الموجودة في أسفل الصفحة.
           </p>
 
-          {/* =====================================================
-              سهم الانتقال إلى Footer
-          ====================================================== */}
+          {/* زر الانتقال إلى Footer */}
           <button
             type="button"
             onClick={handleScrollToFooter}
@@ -168,49 +152,47 @@ export default function InfoSideWidget() {
           </button>
         </div>
 
-        {/* =====================================================
-            المقبض الجانبي الغامق والشفاف
-        ====================================================== */}
+        {/* المقبض الجانبي المحدث مع التعتيم الأوتوماتيكي المستمر */}
         <button
           type="button"
           onClick={() => setIsOpen((previous) => !previous)}
           className={`
             absolute
             left-full
-            top-0
-            h-full
             ${handleWidth}
-            bg-slate-900/40
             backdrop-blur-md
-            hover:bg-slate-900/60
-            rounded-r-xl
             flex
             items-center
             justify-center
             shadow-lg
             transition-all
-            duration-300
+            duration-500
+            ease-in-out
             cursor-pointer
             border
             border-slate-700/50
             border-l-0
+            ${
+              isOpen
+                ? "top-0 h-full rounded-r-xl bg-slate-900/40 hover:bg-slate-900/70"
+                : "top-1/2 -translate-y-1/2 h-[30%] rounded-r-xl animate-pulse bg-slate-900/40 hover:bg-slate-900/80"
+            }
           `}
           title={isOpen ? "إغلاق" : "عرض المزيد من الشروحات"}
           aria-label={isOpen ? "إغلاق البطاقة" : "فتح بطاقة المعلومات"}
           aria-expanded={isOpen}
         >
-          {/* الأيقونة بارزة بوضوح ولون العنبر (Amber) الساطع */}
           <span
             className={`
               inline-block
-              text-sm
+              text-xs
               font-black
               text-amber-400
               drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]
               leading-none
               transition-transform
               duration-500
-              ${isOpen ? "rotate-180" : "rotate-0 animate-pulse"}
+              ${isOpen ? "rotate-180" : "rotate-0"}
             `}
           >
             ❮
