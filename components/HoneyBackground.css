@@ -1,0 +1,30 @@
+/* حاوية شفافة تماماً ولا تؤثر على خلفية الموقع */
+.honey-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.honey-drop-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  animation: honeyRise linear infinite;
+}
+
+/* تحريك القطرات من الأسفل إلى الأعلى */
+@keyframes honeyRise {
+  from {
+    transform: translateY(2000px);
+  }
+  to {
+    transform: translateY(0px);
+  }
+}
