@@ -27,11 +27,14 @@ export default function Header() {
         <div className="flex items-center gap-6">
           {/* روابط الشاشات الكبيرة */}
           <nav className="hidden md:flex items-center gap-6 font-semibold text-sm text-slate-900">
-            <Link href="/" className="hover:text-amber-600 transition">
+            {/* <Link href="/" className="hover:text-amber-600 transition">
               الرئيسية
-            </Link>
+            </Link> */}
             <Link href="/#products" className="hover:text-amber-600 transition">
               المنتجات
+            </Link>
+            <Link href="/offers" className="hover:text-amber-600 transition">
+              العروضات
             </Link>
             <Link href="/developer" className="hover:text-amber-600 transition">
               المطور
@@ -73,19 +76,26 @@ export default function Header() {
       >
         <div className="overflow-hidden">
           <nav className="py-3 space-y-2">
-            <Link
+            {/* <Link
               href="/"
               onClick={() => setIsMenuOpen(false)}
               className="block py-2 text-sm font-semibold hover:text-amber-600 transition"
             >
               الرئيسية
-            </Link>
+            </Link> */}
             <Link
               href="/#products"
               onClick={() => setIsMenuOpen(false)}
               className="block py-2 text-sm font-semibold hover:text-amber-600 transition"
             >
               المنتجات
+            </Link>
+            <Link
+              href="/offers"
+              onClick={() => setIsMenuOpen(false)}
+              className="block py-2 text-sm font-semibold hover:text-amber-600 transition"
+            >
+              العروضات
             </Link>
             <Link
               href="/developer"
