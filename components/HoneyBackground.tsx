@@ -13,6 +13,7 @@ interface Drop {
   swayOffset: number;    // زاوية البداية لتوزيع الحركة
   offsetX: number;       // الإزاحة الناتجة عن الماوس (X)
   offsetY: number;       // الإزاحة الناتجة عن الماوس (Y)
+  hueOffset: number;     // تنوع درجات ألوان قوس قزح لكل فقاعة
 }
 
 const EmeraldBackground: React.FC = () => {
@@ -33,7 +34,7 @@ const EmeraldBackground: React.FC = () => {
     const mouse = {
       x: -1000,
       y: -1000,
-      radius: 120, // نطاق تأثير الماوس
+      radius: 140, // نطاق تأثير الماوس
     };
 
     const handleResize = () => {
@@ -56,18 +57,19 @@ const EmeraldBackground: React.FC = () => {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseleave", handleMouseLeave);
 
-    const dropsCount = 65;
+    const dropsCount = 50;
     const drops: Drop[] = Array.from({ length: dropsCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      radius: Math.random() * 4.5 + 2.5,
-      speed: Math.random() * 0.45 + 0.15,
-      opacity: Math.random() * 0.35 + 0.25,
-      swaySpeed: Math.random() * 0.012 + 0.005,
-      swayAmplitude: Math.random() * 25 + 10,
+      radius: Math.random() * 12 + 6,
+      speed: Math.random() * 0.5 + 0.2,
+      opacity: Math.random() * 0.45 + 0.35,
+      swaySpeed: Math.random() * 0.01 + 0.004,
+      swayAmplitude: Math.random() * 20 + 8,
       swayOffset: Math.random() * Math.PI * 2,
       offsetX: 0,
       offsetY: 0,
+      hueOffset: Math.random() * 360, // إعطاء كل فقاعة بصمة ألوان قزحية خاصة بها
     }));
 
     let time = 0;
@@ -94,42 +96,77 @@ const EmeraldBackground: React.FC = () => {
           const force = (mouse.radius - distance) / mouse.radius;
           const angle = Math.atan2(dy, dx);
           
-          drop.offsetX += Math.cos(angle) * force * 3;
-          drop.offsetY += Math.sin(angle) * force * 3;
+          drop.offsetX += Math.cos(angle) * force * 4;
+          drop.offsetY += Math.sin(angle) * force * 4;
         }
 
-        // العودة النيرّة للموقع الأصلي
+        // العودة المرنة للموقع الأصلي
         drop.offsetX *= 0.92;
         drop.offsetY *= 0.92;
 
         const currentX = baseX + drop.offsetX;
         const currentY = baseY + drop.offsetY;
+        const r = drop.radius;
 
-        // التدرج الشعاعي باستخدام اللونين المطلوبين
-        const radialGradient = ctx.createRadialGradient(
+        // --- 1. رسم غشاء الفقاعة الشفاف مع حواف قزحية حقيقية (Rainbow Soap Rim) ---
+        const rimGradient = ctx.createRadialGradient(
           currentX,
           currentY,
-          0,
+          r * 0.6,
           currentX,
           currentY,
-          drop.radius * 2.5
+          r
         );
 
-        // #00ff3b -> RGBA(0, 255, 59)   (اللون النيون الفوسفوري الساطع في المركز)
-        // #006d19 -> RGBA(0, 109, 25)   (اللون الأخضر الزمردي الغامق للعمق)
-        radialGradient.addColorStop(0, `rgba(0, 255, 59, ${drop.opacity * 0.9})`);
-        radialGradient.addColorStop(0.5, `rgba(0, 109, 25, ${drop.opacity * 0.6})`);
-        radialGradient.addColorStop(1, "rgba(0, 255, 59, 0)");
+        // ألوان انعكاس الصابون الحقيقي (بنفسجي، أزرق سماوي، وردي، أصفر ناعم)
+        const baseHue = (drop.hueOffset + time * 10) % 360;
+        
+        rimGradient.addColorStop(0, "rgba(255, 255, 255, 0)"); // مجوف تماماً وشفاف من الداخل
+        rimGradient.addColorStop(0.7, `hsla(${baseHue}, 80%, 70%, ${drop.opacity * 0.15})`);
+        rimGradient.addColorStop(0.85, `hsla(${(baseHue + 60) % 360}, 90%, 75%, ${drop.opacity * 0.7})`); // انعكاس وردي / سماوي
+        rimGradient.addColorStop(0.95, `rgba(255, 255, 255, ${drop.opacity * 0.9})`); // حافة بيضاء زجاجية مشعة
+        rimGradient.addColorStop(1, "rgba(255, 255, 255, 0)");
 
         ctx.beginPath();
-        ctx.arc(currentX, currentY, drop.radius * 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = radialGradient;
+        ctx.arc(currentX, currentY, r, 0, Math.PI * 2);
+        ctx.fillStyle = rimGradient;
         ctx.fill();
 
-        // بريق ناصع في منتصف الفقاعة باللون النيون #00ff3b
+        // --- 2. قوس انكسار الضوء السفلي الملون (Iridescent Rainbow Arc) ---
         ctx.beginPath();
-        ctx.arc(currentX, currentY, drop.radius * 0.6, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 255, 59, ${drop.opacity * 0.7})`;
+        ctx.arc(currentX, currentY, r * 0.82, Math.PI * 0.2, Math.PI * 0.85);
+        ctx.strokeStyle = `hsla(${(baseHue + 120) % 360}, 100%, 75%, ${drop.opacity * 0.5})`;
+        ctx.lineWidth = r * 0.14;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        // --- 3. انعكاس الضوء الأبيض الرئيسي في الأعلى (Main White Specular Highlight) ---
+        const highlightX = currentX - r * 0.35;
+        const highlightY = currentY - r * 0.35;
+        const highlightRadius = r * 0.3;
+
+        const highlightGradient = ctx.createRadialGradient(
+          highlightX,
+          highlightY,
+          0,
+          highlightX,
+          highlightY,
+          highlightRadius
+        );
+
+        highlightGradient.addColorStop(0, `rgba(255, 255, 255, ${drop.opacity * 0.95})`);
+        highlightGradient.addColorStop(0.5, `rgba(230, 245, 255, ${drop.opacity * 0.5})`);
+        highlightGradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+        ctx.beginPath();
+        ctx.arc(highlightX, highlightY, highlightRadius, 0, Math.PI * 2);
+        ctx.fillStyle = highlightGradient;
+        ctx.fill();
+
+        // --- 4. بريق ثانوي عكسي صغير (Secondary Bottom Reflection) ---
+        ctx.beginPath();
+        ctx.arc(currentX + r * 0.38, currentY + r * 0.38, r * 0.09, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${drop.opacity * 0.6})`;
         ctx.fill();
 
         ctx.restore();
@@ -138,12 +175,13 @@ const EmeraldBackground: React.FC = () => {
         drop.y -= drop.speed;
 
         // إعادة القطرة للأسفل عند وصولها للقمة
-        if (drop.y < -30) {
-          drop.y = height + 30;
+        if (drop.y < -40) {
+          drop.y = height + 40;
           drop.x = Math.random() * width;
           drop.swayOffset = Math.random() * Math.PI * 2;
           drop.offsetX = 0;
           drop.offsetY = 0;
+          drop.hueOffset = Math.random() * 360;
         }
       });
 
