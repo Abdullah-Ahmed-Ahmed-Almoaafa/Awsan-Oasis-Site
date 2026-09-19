@@ -25,7 +25,6 @@ export default function OfferFormModal({
   const [itemsText, setItemsText] = useState("");
   const [originalPrice, setOriginalPrice] = useState<number | "">(0);
   const [offerPrice, setOfferPrice] = useState<number | "">(0);
-  // 1. التعديل هنا: القيمة الافتراضية للـ state
   const [stockStatus, setStockStatus] = useState<StockStatus>("LIMITED");
   const [remainingQuantity, setRemainingQuantity] = useState<number | "">("");
   const [unitSelect, setUnitSelect] = useState("عرض / عروض");
@@ -44,7 +43,6 @@ export default function OfferFormModal({
       setItemsText(initialData.items ? initialData.items.join("\n") : "");
       setOriginalPrice(initialData.originalPrice || 0);
       setOfferPrice(initialData.offerPrice || 0);
-      // 2. التعديل هنا: في حال عدم وجود قيمة في initialData
       setStockStatus(initialData.stockStatus || "LIMITED");
       setRemainingQuantity(
         initialData.remainingQuantity !== undefined ? initialData.remainingQuantity : ""
@@ -68,7 +66,6 @@ export default function OfferFormModal({
       setItemsText("");
       setOriginalPrice(0);
       setOfferPrice(0);
-      // 3. التعديل هنا: عند إعادة ضبط النموذج لإضافة عرض جديد
       setStockStatus("LIMITED");
       setRemainingQuantity("");
       setUnitSelect("عرض / عروض");
@@ -179,87 +176,95 @@ export default function OfferFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm overflow-y-auto">
-      <div className="w-full max-w-lg rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl my-8">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-          <h2 className="text-lg font-bold text-amber-400">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 sm:p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-2xl bg-slate-900 border border-slate-800 p-5 shadow-2xl flex flex-col max-h-[90vh]">
+        {/* رأس النافذة */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3 shrink-0">
+          <h2 className="text-base font-bold text-amber-400">
             {initialData ? "تعديل العرض" : "إضافة عرض جديد"}
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">✕</button>
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className="text-slate-400 hover:text-white text-lg font-bold px-2"
+          >
+            ✕
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* جسم الاستمارة - يتلقى السكرول عند الكبر */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-y-auto space-y-3 pr-1 pl-1 custom-scrollbar">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">عنوان العرض</label>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1">عنوان العرض</label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">شارة العرض (Tagline)</label>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1">شارة العرض (Tagline)</label>
               <input
                 type="text"
                 placeholder="التوصيل مجاناً..."
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">وصف العرض</label>
+            <label className="block text-[11px] font-semibold text-slate-300 mb-1">وصف العرض</label>
             <textarea
               rows={2}
               required
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full resize-none rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+              className="w-full resize-none rounded-xl border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">محتويات العرض (سطر لكل عنصر)</label>
+            <label className="block text-[11px] font-semibold text-slate-300 mb-1">محتويات العرض (سطر لكل عنصر)</label>
             <textarea
               rows={2}
               placeholder={"عسل سدر 1 كيلو\nمكسرات مجاناً"}
               value={itemsText}
               onChange={(e) => setItemsText(e.target.value)}
-              className="w-full resize-none rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+              className="w-full resize-none rounded-xl border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">السعر السابق</label>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1">السعر السابق</label>
               <input
                 type="number"
                 value={originalPrice}
                 onChange={(e) => setOriginalPrice(e.target.value === "" ? "" : Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-2.5 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">سعر العرض</label>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1">سعر العرض</label>
               <input
                 type="number"
                 required
                 value={offerPrice}
                 onChange={(e) => setOfferPrice(e.target.value === "" ? "" : Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-2.5 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">العملة</label>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1">العملة</label>
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-2 py-2 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
               >
                 <option value="ر.ي">يمني (ر.ي)</option>
                 <option value="ر.س">سعودي (ر.س)</option>
@@ -267,11 +272,11 @@ export default function OfferFormModal({
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">الوحدة</label>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1">الوحدة</label>
               <select
                 value={unitSelect}
                 onChange={(e) => setUnitSelect(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-2 py-2 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
               >
                 {PRESET_UNITS.map((u) => (
                   <option key={u} value={u}>{u}</option>
@@ -289,35 +294,35 @@ export default function OfferFormModal({
                 placeholder="الوحدة المخصصة..."
                 value={customUnit}
                 onChange={(e) => setCustomUnit(e.target.value)}
-                className="w-full rounded-xl border border-amber-500/50 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-xl border border-amber-500/50 bg-slate-950 px-3 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
               />
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-800 pt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 border-t border-slate-800 pt-2.5">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">حالة التوفر</label>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1">حالة التوفر</label>
               <select
                 value={stockStatus}
                 onChange={(e) => setStockStatus(e.target.value as StockStatus)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-amber-400 font-bold focus:border-amber-500 focus:outline-none cursor-pointer"
               >
-                <option value="AVAILABLE"> الكمية متوفرة</option>
-                <option value="LIMITED"> الكمية محدودة</option>
-                <option value="PRE_ORDER"> طلب مسبق</option>
-                <option value="OUT_OF_STOCK"> نفذت الكمية</option>
+                <option value="AVAILABLE">الكمية متوفرة</option>
+                <option value="LIMITED">الكمية محدودة</option>
+                <option value="PRE_ORDER">طلب مسبق</option>
+                <option value="OUT_OF_STOCK">نفذت الكمية</option>
               </select>
             </div>
 
             {stockStatus === "LIMITED" && (
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">العدد المتبقي (اختياري)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">العدد المتبقي (اختياري)</label>
                 <input
                   type="number"
                   placeholder="مثال: 5"
                   value={remainingQuantity}
                   onChange={(e) => setRemainingQuantity(e.target.value === "" ? "" : Number(e.target.value))}
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
                 />
               </div>
             )}
@@ -325,8 +330,8 @@ export default function OfferFormModal({
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-xs font-semibold text-slate-300">صور العرض</label>
-              <span className="text-[11px] text-amber-400 font-semibold">{images.length} / 4 صور</span>
+              <label className="block text-[11px] font-semibold text-slate-300">صور العرض</label>
+              <span className="text-[10px] text-amber-400 font-semibold">{images.length} / 4 صور</span>
             </div>
             <input
               type="file"
@@ -334,18 +339,18 @@ export default function OfferFormModal({
               multiple
               disabled={images.length >= 4}
               onChange={handleFileUpload}
-              className="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 cursor-pointer bg-slate-950 rounded-xl border border-slate-700 p-1"
+              className="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-amber-500 file:text-slate-950 cursor-pointer bg-slate-950 rounded-xl border border-slate-700 p-1"
             />
             {uploadError && <p className="text-red-400 text-xs mt-1 font-semibold">{uploadError}</p>}
             {images.length > 0 && (
-              <div className="grid grid-cols-4 gap-2 pt-3">
+              <div className="grid grid-cols-4 gap-2 pt-2">
                 {images.map((img, i) => (
-                  <div key={i} className="relative h-16 w-full rounded-lg overflow-hidden border border-slate-700">
+                  <div key={i} className="relative h-14 w-full rounded-lg overflow-hidden border border-slate-700">
                     <Image src={img} alt="" fill className="object-cover" />
                     <button
                       type="button"
                       onClick={() => handleRemoveImage(i)}
-                      className="absolute top-1 right-1 rounded-full bg-red-600/80 p-1 text-white text-xs"
+                      className="absolute top-1 right-1 rounded-full bg-red-600/80 p-0.5 px-1.5 text-white text-[10px]"
                     >
                       ✕
                     </button>
@@ -355,7 +360,7 @@ export default function OfferFormModal({
             )}
           </div>
 
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-1 mb-2">
             <input
               type="checkbox"
               id="isActive"
@@ -368,18 +373,19 @@ export default function OfferFormModal({
             </label>
           </div>
 
-          <div className="pt-4 flex gap-3">
+          {/* أزرار الإجراءات - مثبيتة دائماً في أسفل النافذة */}
+          <div className="pt-3 border-t border-slate-800 flex gap-3 shrink-0 mt-auto">
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-xl bg-amber-500 py-2.5 text-sm font-bold text-slate-950 hover:bg-amber-400 transition disabled:opacity-50"
+              className="flex-1 rounded-xl bg-amber-500 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition disabled:opacity-50 cursor-pointer"
             >
               {loading ? "جاري الحفظ..." : initialData ? "حفظ التعديلات" : "إضافة العرض"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-700"
+              className="rounded-xl bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 cursor-pointer"
             >
               إلغاء
             </button>

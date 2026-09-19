@@ -30,7 +30,7 @@ export default function OffersPage() {
       {/* خلفية العسل الضبابية */}
       <HoneyBackground />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* الهيدر الترويجي للعروض */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold px-3 py-1.5 rounded-full mb-3 backdrop-blur-sm">

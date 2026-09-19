@@ -87,7 +87,7 @@ export default function OfferDetailPage({ params }: { params: Promise<{ id: stri
     `سعر العرض: ${offer.offerPrice} ${currencySymbol}`;
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4">
+    <div className="max-w-4xl mx-auto py-6">
       <button
         onClick={() => router.back()}
         className="mb-6 flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition cursor-pointer"

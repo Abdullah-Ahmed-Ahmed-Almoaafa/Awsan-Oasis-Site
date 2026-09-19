@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" data-scroll-behavior="smooth">
       <body
         className={`${cairo.className} bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased`}
       >

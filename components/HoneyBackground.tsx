@@ -8,9 +8,14 @@ interface Drop {
   radius: number;
   speed: number;
   opacity: number;
+  swaySpeed: number;     // سرعة التذبذب الجانبي
+  swayAmplitude: number; // مدى اتساع الموجة
+  swayOffset: number;    // زاوية البداية لتوزيع الحركة
+  offsetX: number;       // الإزاحة الناتجة عن الماوس (X)
+  offsetY: number;       // الإزاحة الناتجة عن الماوس (Y)
 }
 
-const HoneyBackground: React.FC = () => {
+const EmeraldBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -24,58 +29,121 @@ const HoneyBackground: React.FC = () => {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
+    // تتبع موقع الماوس
+    const mouse = {
+      x: -1000,
+      y: -1000,
+      radius: 120, // نطاق تأثير الماوس
+    };
+
     const handleResize = () => {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     };
 
-    window.addEventListener("resize", handleResize);
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
 
-    // إنشاء 60 قطرة عسل دافئة وناعمة
-    const dropsCount = 60;
+    const handleMouseLeave = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseleave", handleMouseLeave);
+
+    const dropsCount = 65;
     const drops: Drop[] = Array.from({ length: dropsCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      radius: Math.random() * 4 + 2.5,   // زيادة طفيفة في الحجم لتستوعب التلاشي الناعم
-      speed: Math.random() * 0.5 + 0.15, // حركة انسيابية بطيئة
-      opacity: Math.random() * 0.35 + 0.25, // درجة شفافية ناعمة للغاية
+      radius: Math.random() * 4.5 + 2.5,
+      speed: Math.random() * 0.45 + 0.15,
+      opacity: Math.random() * 0.35 + 0.25,
+      swaySpeed: Math.random() * 0.012 + 0.005,
+      swayAmplitude: Math.random() * 25 + 10,
+      swayOffset: Math.random() * Math.PI * 2,
+      offsetX: 0,
+      offsetY: 0,
     }));
+
+    let time = 0;
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
+      time += 0.02;
 
       drops.forEach((drop) => {
         ctx.save();
-        
-        // إنشاء تدرج شعاعي يعطي تأثير الضبابية والنعومة (Blur Effect)
+
+        // حساب حركة الاهتزاز الجانبية
+        const sway = Math.sin(time * drop.swaySpeed * 60 + drop.swayOffset) * drop.swayAmplitude;
+        const baseX = drop.x + sway;
+        const baseY = drop.y;
+
+        // حساب المسافة بين الماوس والفقاعة
+        const dx = (baseX + drop.offsetX) - mouse.x;
+        const dy = (baseY + drop.offsetY) - mouse.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // التفاعل مع الماوس
+        if (distance < mouse.radius && distance > 0) {
+          const force = (mouse.radius - distance) / mouse.radius;
+          const angle = Math.atan2(dy, dx);
+          
+          drop.offsetX += Math.cos(angle) * force * 3;
+          drop.offsetY += Math.sin(angle) * force * 3;
+        }
+
+        // العودة النيرّة للموقع الأصلي
+        drop.offsetX *= 0.92;
+        drop.offsetY *= 0.92;
+
+        const currentX = baseX + drop.offsetX;
+        const currentY = baseY + drop.offsetY;
+
+        // التدرج الشعاعي باستخدام اللونين المطلوبين
         const radialGradient = ctx.createRadialGradient(
-          drop.x,
-          drop.y,
+          currentX,
+          currentY,
           0,
-          drop.x,
-          drop.y,
-          drop.radius * 2 // إشعاع هالة التلاشي
+          currentX,
+          currentY,
+          drop.radius * 2.5
         );
 
-        // مركز دافئ ونواة متدرجة للخارج بنعومة
-        radialGradient.addColorStop(0, `rgba(217, 119, 6, ${drop.opacity})`);
-        radialGradient.addColorStop(0.4, `rgba(180, 83, 9, ${drop.opacity * 0.5})`);
-        radialGradient.addColorStop(1, "rgba(217, 119, 6, 0)"); // تلاشي كامل عند الأطراف
+        // #00ff3b -> RGBA(0, 255, 59)   (اللون النيون الفوسفوري الساطع في المركز)
+        // #006d19 -> RGBA(0, 109, 25)   (اللون الأخضر الزمردي الغامق للعمق)
+        radialGradient.addColorStop(0, `rgba(0, 255, 59, ${drop.opacity * 0.9})`);
+        radialGradient.addColorStop(0.5, `rgba(0, 109, 25, ${drop.opacity * 0.6})`);
+        radialGradient.addColorStop(1, "rgba(0, 255, 59, 0)");
 
         ctx.beginPath();
-        ctx.arc(drop.x, drop.y, drop.radius * 2, 0, Math.PI * 2);
+        ctx.arc(currentX, currentY, drop.radius * 2.5, 0, Math.PI * 2);
         ctx.fillStyle = radialGradient;
         ctx.fill();
+
+        // بريق ناصع في منتصف الفقاعة باللون النيون #00ff3b
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, drop.radius * 0.6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 255, 59, ${drop.opacity * 0.7})`;
+        ctx.fill();
+
         ctx.restore();
 
         // تحريك القطرة للأعلى
         drop.y -= drop.speed;
 
         // إعادة القطرة للأسفل عند وصولها للقمة
-        if (drop.y < -20) {
-          drop.y = height + 20;
+        if (drop.y < -30) {
+          drop.y = height + 30;
           drop.x = Math.random() * width;
+          drop.swayOffset = Math.random() * Math.PI * 2;
+          drop.offsetX = 0;
+          drop.offsetY = 0;
         }
       });
 
@@ -86,6 +154,8 @@ const HoneyBackground: React.FC = () => {
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -99,7 +169,7 @@ const HoneyBackground: React.FC = () => {
   );
 };
 
-export default HoneyBackground;
+export default EmeraldBackground;
 
 
 // "use client";
